@@ -411,7 +411,7 @@ ENDPOINT_MINIPAIR MicArray1Miniports =
     SIZEOF_ARRAY(MicArrayPinDeviceFormatsAndModes),
     MicArray1TopologyPhysicalConnections,
     SIZEOF_ARRAY(MicArray1TopologyPhysicalConnections),
-    ENDPOINT_SOUNDDETECTOR_SUPPORTED,
+    ENDPOINT_NO_FLAGS,
     NULL, 0, NULL,                          // audio module settings.
 };
 
@@ -455,7 +455,7 @@ ENDPOINT_MINIPAIR MicArray2Miniports =
     SIZEOF_ARRAY(MicArray2PinDeviceFormatsAndModes),
     MicArray2TopologyPhysicalConnections,
     SIZEOF_ARRAY(MicArray2TopologyPhysicalConnections),
-    ENDPOINT_SOUNDDETECTOR_SUPPORTED,
+    ENDPOINT_NO_FLAGS,
     NULL, 0, NULL,                          // audio module settings.
 };
 

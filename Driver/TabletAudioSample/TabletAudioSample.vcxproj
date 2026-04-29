@@ -27,6 +27,8 @@
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">x64</Platform>
     <SampleGuid>{2A9A946E-F017-4E0D-BF75-AD81E7E97D64}</SampleGuid>
+    <ProjectName>BasilVirtualOut</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -197,7 +199,7 @@
         see INF file for more info.
     -->
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_USE_WAVERT_;SYSVAD_BTH_BYPASS;SYSVAD_USB_SIDEBAND;_USE_IPortClsRuntimePower;_NEW_DELETE_OPERATORS_</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\EndpointsCommon;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\km;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\shared;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\um;..\EndpointsCommon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>
       </ExceptionHandling>
     </ClCompile>
@@ -220,7 +222,7 @@
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_USE_WAVERT_;SYSVAD_BTH_BYPASS;SYSVAD_USB_SIDEBAND;_USE_IPortClsRuntimePower;_NEW_DELETE_OPERATORS_</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\EndpointsCommon;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\km;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\shared;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\um;..\EndpointsCommon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>
       </ExceptionHandling>
     </ClCompile>
@@ -243,7 +245,7 @@
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_USE_WAVERT_;SYSVAD_BTH_BYPASS;SYSVAD_USB_SIDEBAND;_USE_IPortClsRuntimePower;_NEW_DELETE_OPERATORS_</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\EndpointsCommon;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\km;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\shared;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\um;..\EndpointsCommon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>
       </ExceptionHandling>
     </ClCompile>
@@ -266,7 +268,7 @@
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_USE_WAVERT_;SYSVAD_BTH_BYPASS;SYSVAD_USB_SIDEBAND;_USE_IPortClsRuntimePower;_NEW_DELETE_OPERATORS_</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\EndpointsCommon;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\km;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\shared;$(ProgramFiles(x86))\Windows Kits\10\Include\10.0.26100.0\um;..\EndpointsCommon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>
       </ExceptionHandling>
     </ClCompile>

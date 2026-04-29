@@ -16,6 +16,7 @@ Abstract:
 #define _SYSVAD_H_
 
 #include <portcls.h>
+//#include "C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\km\portcls.h"
 #include <stdunk.h>
 #include <ksdebug.h>
 #include <ntintsafe.h>

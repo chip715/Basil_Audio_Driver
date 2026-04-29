@@ -34,96 +34,6 @@ typedef CMiniportWaveRTStream *PCMiniportWaveRTStream;
 ///////////////////////////////////////////////////////////////////////////////
 // CKeywordDetector
 //
-class CKeywordDetector
-{
-public:
-    CKeywordDetector();
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    NTSTATUS ResetDetector(_In_ GUID eventId);
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    NTSTATUS DownloadDetectorData(_In_ GUID eventId, _In_ LONGLONG Data);
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    NTSTATUS GetDetectorData(_In_ GUID eventId, _Out_ LONGLONG *Data);
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    ULONGLONG GetStartTimestamp();
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    ULONGLONG GetStopTimestamp();
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    NTSTATUS SetArmed(_In_ GUID eventId, _In_ BOOL Arm);
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    VOID NotifyDetection();
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    NTSTATUS GetArmed(_In_ GUID eventId, _Out_ BOOL *Arm);
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    NTSTATUS GetStreamingSupport(_In_ GUID eventId, _Out_ BOOL *Support);
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    VOID Run();
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    VOID Stop();
-
-    _IRQL_requires_min_(DISPATCH_LEVEL)
-    VOID DpcRoutine(_In_ LONGLONG PerformanceCounter, _In_ LONGLONG PerformanceFrequency);
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    NTSTATUS GetReadPacket(_In_ ULONG PacketsPerWaveRtBuffer, _In_  ULONG WaveRtBufferSize, _Out_writes_(WaveRtBufferSize) BYTE *WaveRtBuffer, _Out_ ULONG *PacketNumber, _Out_ ULONGLONG *PerformanceCount, _Out_ BOOL *MoreData);
-
-private:
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    VOID ResetFifo();
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    NTSTATUS ReadKeywordTimestampRegistry();
-
-    _IRQL_requires_max_(PASSIVE_LEVEL)
-    VOID StartBufferingStream();
-
-    // The Contoso keyword detector processes 10ms packets of 16KHz 16-bit PCM
-    // audio samples
-    static const int SamplesPerSecond = 16000;
-    static const int SamplesPerPacket = (10 * SamplesPerSecond / 1000);
-
-    typedef struct
-    {
-        LIST_ENTRY  ListEntry;
-        LONGLONG    PacketNumber;
-        LONGLONG    QpcWhenSampled;
-        UINT16      Samples[SamplesPerPacket];
-    } PACKET_ENTRY;
-
-    BOOL            m_streamRunning;
-
-    BOOL            m_SoundDetectorArmed1;
-    BOOL            m_SoundDetectorArmed2;
-    LONGLONG        m_SoundDetectorData1;
-    LONGLONG        m_SoundDetectorData2;
-
-    LONGLONG        m_qpcStartCapture;
-    LONGLONG        m_qpcFrequency;
-    LONGLONG        m_nLastQueuedPacket;
-
-    ULONGLONG       m_ullKeywordStartTimestamp;
-    ULONGLONG       m_ullKeywordStopTimestamp;
-
-    KSPIN_LOCK      PacketPoolSpinLock;
-    LIST_ENTRY      PacketPoolHead;
-    PACKET_ENTRY    PacketPool[1 * SamplesPerSecond / SamplesPerPacket];    // Enough storage for 1 second of audio data
-
-    KSPIN_LOCK      PacketFifoSpinLock;
-    LIST_ENTRY      PacketFifoHead;
-
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 // CMiniportWaveRT
 //   
@@ -138,7 +48,6 @@ private:
     ULONG                               m_ulLoopbackAllocated;
     ULONG                               m_ulSystemAllocated;
     ULONG                               m_ulOffloadAllocated;
-    ULONG                               m_ulKeywordDetectorAllocated;
 
     ULONG                               m_ulMaxSystemStreams;
     ULONG                               m_ulMaxOffloadStreams;
@@ -167,7 +76,6 @@ private:
     ULONG                               m_ulMixDrmContentId;
     CONSTRICTOR_OPTION                  m_LoopbackProtection;
 
-    CKeywordDetector                    m_KeywordDetector;
 
     union {
         PVOID                           m_DeviceContext;
@@ -188,18 +96,6 @@ protected:
 
 
 public:
-    DECLARE_PROPERTYHANDLER(Get_SoundDetectorSupportedPatterns);
-    DECLARE_PROPERTYHANDLER(Set_SoundDetectorPatterns);
-    DECLARE_PROPERTYHANDLER(Get_SoundDetectorArmed);
-    DECLARE_PROPERTYHANDLER(Set_SoundDetectorArmed);
-    DECLARE_PROPERTYHANDLER(Get_SoundDetectorMatchResult);
-
-    DECLARE_PROPERTYHANDLER(Get_SoundDetectorSupportedPatterns2);
-    DECLARE_PROPERTYHANDLER(Set_SoundDetectorPatterns2);
-    DECLARE_PROPERTYHANDLER(Get_SoundDetectorArmed2);
-    DECLARE_PROPERTYHANDLER(Set_SoundDetectorArmed2);
-    DECLARE_PROPERTYHANDLER(Set_SoundDetectorReset2);
-    DECLARE_PROPERTYHANDLER(Get_SoundDetectorStreamingSupport2);
 
     DECLARE_PROPERTYHANDLER(Get_InterleavedFormatInformation);
 
@@ -209,10 +105,6 @@ public:
         _In_  PPCEVENT_REQUEST EventRequest
     );
 
-    NTSTATUS EventHandler_SoundDetectorMatchDetected
-    (
-        _In_  PPCEVENT_REQUEST EventRequest
-    );
 
     NTSTATUS ValidateStreamCreate
     (
@@ -291,7 +183,6 @@ public:
         m_ulMaxSystemStreams(0),
         m_ulMaxOffloadStreams(0),
         m_ulMaxLoopbackStreams(0),
-        m_ulMaxKeywordDetectorStreams(0),
         m_DeviceType(MiniportPair->DeviceType),
         m_DeviceContext(DeviceContext),
         m_DeviceMaxChannels(MiniportPair->DeviceMaxChannels),
@@ -396,10 +287,6 @@ public:
     );   
 
 public:
-    VOID DpcRoutine(LONGLONG PerformanceCounter, LONGLONG PerformanceFrequency)
-    {
-        m_KeywordDetector.DpcRoutine(PerformanceCounter, PerformanceFrequency);
-    }
 
     NTSTATUS PropertyHandlerEffectListRequest
     (

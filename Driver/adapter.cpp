@@ -21,20 +21,10 @@ Abstract:
 #define PUT_GUIDS_HERE
 
 #include <sysvad.h>
-#include <ContosoKeywordDetector.h>
 #include "IHVPrivatePropertySet.h"
-
 #include "simple.h"
 #include "minipairs.h"
-#ifdef SYSVAD_BTH_BYPASS
-#include "bthhfpminipairs.h"
-#endif // SYSVAD_BTH_BYPASS
-#ifdef SYSVAD_USB_SIDEBAND
-#include "usbhsminipairs.h"
-#endif // SYSVAD_USB_SIDEBAND
-#ifdef SYSVAD_A2DP_SIDEBAND
-#include "a2dphpminipairs.h"
-#endif // SYSVAD_A2DP_SIDEBAND
+
 
 
 
@@ -254,32 +244,6 @@ DWORD g_DisableToneGenerator = 0;  // default is to generate tones.
 UNICODE_STRING g_RegistryPath;      // This is used to store the registry settings path for the driver
 
 
-#ifdef SYSVAD_BTH_BYPASS
-//
-// This driver listens for arrival/removal of the bth sco bypass interfaces by 
-// default. Use the registry value DisableBthScoBypass (DWORD) > 0 to override 
-// this default.
-//
-DWORD g_DisableBthScoBypass = 0;   // default is SCO bypass enabled.
-#endif // SYSVAD_BTH_BYPASS
-
-#ifdef SYSVAD_USB_SIDEBAND
-//
-// This driver listens for arrival/removal of the USB Sideband interfaces by 
-// default. Use the registry value DisableUsbSideband (DWORD) > 0 to override 
-// this default.
-//
-DWORD g_DisableUsbSideband = 0;   // default is USB bypass enabled.
-#endif // SYSVAD_USB_SIDEBAND
-
-#ifdef SYSVAD_A2DP_SIDEBAND
-//
-// This driver listens for arrival/removal of the Bluetooth A2DP Sideband interfaces by 
-// default. Use the registry value DisableA2dpSideband (DWORD) > 0 to override 
-// this default.
-//
-DWORD g_DisableA2dpSideband = 0; // default is A2DP bypass enabled.
-#endif
 
 //-----------------------------------------------------------------------------
 // Functions
@@ -431,12 +395,6 @@ Returns:
     // QueryRoutine     Flags                                               Name                     EntryContext             DefaultType                                                    DefaultData              DefaultLength
         { NULL,   RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_TYPECHECK, L"DoNotCreateDataFiles", &g_DoNotCreateDataFiles, (REG_DWORD << RTL_QUERY_REGISTRY_TYPECHECK_SHIFT) | REG_DWORD, &g_DoNotCreateDataFiles, sizeof(ULONG)},
         { NULL,   RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_TYPECHECK, L"DisableToneGenerator", &g_DisableToneGenerator, (REG_DWORD << RTL_QUERY_REGISTRY_TYPECHECK_SHIFT) | REG_DWORD, &g_DisableToneGenerator, sizeof(ULONG)},
-#ifdef SYSVAD_BTH_BYPASS
-        { NULL,   RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_TYPECHECK, L"DisableBthScoBypass",  &g_DisableBthScoBypass,  (REG_DWORD << RTL_QUERY_REGISTRY_TYPECHECK_SHIFT) | REG_DWORD, &g_DisableBthScoBypass,  sizeof(ULONG)},
-#endif // SYSVAD_BTH_BYPASS
-#ifdef SYSVAD_USB_SIDEBAND
-        { NULL,   RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_TYPECHECK, L"DisableUsbSideband",  &g_DisableUsbSideband,  (REG_DWORD << RTL_QUERY_REGISTRY_TYPECHECK_SHIFT) | REG_DWORD, &g_DisableUsbSideband,  sizeof(ULONG)},
-#endif // SYSVAD_USB_SIDEBAND
         { NULL,   0,                                                        NULL,                    NULL,                    0,                                                             NULL,                    0}
     };
 
@@ -477,12 +435,6 @@ Returns:
     //
     DPF(D_VERBOSE, ("DoNotCreateDataFiles: %u", g_DoNotCreateDataFiles));
     DPF(D_VERBOSE, ("DisableToneGenerator: %u", g_DisableToneGenerator));
-#ifdef SYSVAD_BTH_BYPASS
-    DPF(D_VERBOSE, ("DisableBthScoBypass: %u", g_DisableBthScoBypass));
-#endif // SYSVAD_BTH_BYPASS
-#ifdef SYSVAD_USB_SIDEBAND
-    DPF(D_VERBOSE, ("DisableUsbSideband: %u", g_DisableUsbSideband));
-#endif // SYSVAD_USB_SIDEBAND
 
     if (DriverKey)
     {
@@ -656,12 +608,6 @@ Return Value:
 
     maxObjects = g_MaxMiniports;
 
-#ifdef SYSVAD_BTH_BYPASS
-    maxObjects += g_MaxBthHfpMiniports; 
-#endif // SYSVAD_BTH_BYPASS
-#ifdef SYSVAD_USB_SIDEBAND
-    maxObjects += g_MaxUsbHsMiniports; 
-#endif // SYSVAD_USB_SIDEBAND
 
     // Tell the class driver to add the device.
     //
@@ -1089,35 +1035,6 @@ Return Value:
     ntStatus = InstallAllCaptureFilters(DeviceObject, Irp, pAdapterCommon);
     IF_FAILED_JUMP(ntStatus, Exit);
 
-#ifdef SYSVAD_BTH_BYPASS
-    if (!g_DisableBthScoBypass)
-    {
-        //
-        // Init infrastructure for Bluetooth HFP - SCO Bypass devices.
-        //
-        ntStatus = pAdapterCommon->InitBthScoBypass();
-        IF_FAILED_JUMP(ntStatus, Exit);
-    }
-#endif // SYSVAD_BTH_BYPASS
-#ifdef SYSVAD_USB_SIDEBAND
-    if (!g_DisableUsbSideband)
-    {
-        //
-        // Init infrastructure for USB Sideband devices.
-        //
-        ntStatus = pAdapterCommon->InitUsbSideband();
-        IF_FAILED_JUMP(ntStatus, Exit);
-    }
-#endif // SYSVAD_USB_SIDEBAND
-
-#ifdef SYSVAD_A2DP_SIDEBAND
-    if (!g_DisableA2dpSideband)
-    {
-        // Init infrastructure for Bluetooth A2DP sideband devices.
-        ntStatus = pAdapterCommon->InitA2dpSideband();
-        IF_FAILED_JUMP(ntStatus, Exit);
-    }
-#endif
 
 #ifdef _USE_SingleComponentMultiFxStates
     //
@@ -1195,35 +1112,6 @@ Return Value:
     switch (stack->MinorFunction)
     {
 
-#ifdef SYSVAD_USB_SIDEBAND
-    case IRP_MN_QUERY_DEVICE_RELATIONS:
-
-        switch (stack->Parameters.QueryDeviceRelations.Type)
-        {
-        case PowerRelations:
-
-            ext = static_cast<PortClassDeviceContext*>(_DeviceObject->DeviceExtension);
-
-            if (ext->m_pCommon != NULL)
-            {
-                ntStatus = ext->m_pCommon->UpdatePowerRelations(_Irp);
-                if (!NT_SUCCESS(ntStatus))
-                {
-                    // Complete the Irp with failure, no need to further process in PortCls
-                    _Irp->IoStatus.Status = ntStatus;
-                    IoCompleteRequest(_Irp, IO_NO_INCREMENT);
-                    return ntStatus;
-                }
-            }
-
-            break;
-
-        default:
-            break;
-        }
-        break;
-#endif // SYSVAD_USB_SIDEBAND
-
     case IRP_MN_REMOVE_DEVICE:
     case IRP_MN_SURPRISE_REMOVAL:
     case IRP_MN_STOP_DEVICE:
@@ -1232,7 +1120,6 @@ Return Value:
         if (ext->m_pCommon != NULL)
         {
             ext->m_pCommon->Cleanup();
-            
             ext->m_pCommon->Release();
             ext->m_pCommon = NULL;
         }

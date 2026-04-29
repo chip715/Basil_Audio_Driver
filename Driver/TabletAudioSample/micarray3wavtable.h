@@ -419,28 +419,54 @@ PCCONNECTION_DESCRIPTOR MicArray3WaveMiniportConnections[] =
 
 //=============================================================================
 static
-PCPROPERTY_ITEM PropertiesMicArray3WaveFilter[] =
+SYSVADPROPERTY_ITEM PropertiesMicArray3WaveFilter[] =
 {
     {
-        &KSPROPSETID_General,
-        KSPROPERTY_GENERAL_COMPONENTID,
-        KSPROPERTY_TYPE_GET | KSPROPERTY_TYPE_BASICSUPPORT,
-        PropertyHandler_WaveFilter
+        {
+            &KSPROPSETID_General,
+            KSPROPERTY_GENERAL_COMPONENTID,
+            KSPROPERTY_TYPE_GET | KSPROPERTY_TYPE_BASICSUPPORT,
+            PropertyHandler_WaveFilter,
+        },
+        0,
+        0,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        0
     },
     {
-        &KSPROPSETID_Pin,
-        KSPROPERTY_PIN_PROPOSEDATAFORMAT,
-        KSPROPERTY_TYPE_SET | KSPROPERTY_TYPE_BASICSUPPORT,
-        PropertyHandler_WaveFilter
+        {
+            &KSPROPSETID_Pin,
+            KSPROPERTY_PIN_PROPOSEDATAFORMAT,
+            KSPROPERTY_TYPE_SET | KSPROPERTY_TYPE_BASICSUPPORT,
+            PropertyHandler_WaveFilter,
+        },
+        0,
+        0,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        0
     },
     {
-        &KSPROPSETID_Pin,
-        KSPROPERTY_PIN_PROPOSEDATAFORMAT2,
-        KSPROPERTY_TYPE_GET | KSPROPERTY_TYPE_BASICSUPPORT,
-        PropertyHandler_WaveFilter
+        {
+            &KSPROPSETID_Pin,
+            KSPROPERTY_PIN_PROPOSEDATAFORMAT2,
+            KSPROPERTY_TYPE_GET | KSPROPERTY_TYPE_BASICSUPPORT,
+            PropertyHandler_WaveFilter,
+        },
+        0,
+        0,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        0
     },
 };
-
 DEFINE_PCAUTOMATION_TABLE_PROP(AutomationMicArray3WaveFilter, PropertiesMicArray3WaveFilter);
 
 //=============================================================================

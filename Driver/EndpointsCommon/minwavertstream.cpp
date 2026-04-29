@@ -913,7 +913,7 @@ NTSTATUS CMiniportWaveRTStream::GetReadPacket
     _Out_ BOOL      *MoreData
 )
 {
-    NTSTATUS ntStatus;
+    //NTSTATUS ntStatus;
     ULONG availablePacketNumber;
     ULONG droppedPackets;
 
@@ -928,18 +928,6 @@ NTSTATUS CMiniportWaveRTStream::GetReadPacket
     if (m_KsState < KSSTATE_PAUSE)
     {
         return STATUS_INVALID_DEVICE_STATE;
-    }
-
-    // If this is the keyword detector pin, then stream from the keyword FIFO
-    if (m_pMiniport->IsKeywordDetectorPin(m_ulPin))
-    {
-        // FUTURE-2014/11/18 Drive this with packet counter
-        ntStatus = m_pMiniport->m_KeywordDetector.GetReadPacket(m_ulNotificationsPerBuffer, m_ulDmaBufferSize, m_pDmaBuffer, PacketNumber, PerformanceCounterValue, MoreData);
-        if (NT_SUCCESS(ntStatus))
-        {
-            m_ulLastOsReadPacket = *PacketNumber;
-        }
-        return ntStatus;
     }
 
     KIRQL oldIrql;
@@ -1252,13 +1240,7 @@ NTSTATUS CMiniportWaveRTStream::SetState
 
             if (m_KsState > KSSTATE_PAUSE)
             {
-                //
-                // Run -> Pause
-                //
-                if (m_pMiniport->IsKeywordDetectorPin(m_ulPin))
-                {
-                    m_pMiniport->m_KeywordDetector.Stop();
-                }
+            
 
                 // Pause DMA
                 if (m_ulNotificationIntervalMs > 0)
@@ -1337,10 +1319,7 @@ NTSTATUS CMiniportWaveRTStream::SetState
 
             // Start DMA
             LARGE_INTEGER ullPerfCounterTemp;
-            if (m_pMiniport->IsKeywordDetectorPin(m_ulPin))
-            {
-                m_pMiniport->m_KeywordDetector.Run();
-            }
+
             ullPerfCounterTemp = KeQueryPerformanceCounter(&m_ullPerformanceCounterFrequency);
             m_ullLastDPCTimeStamp = m_ullDmaTimeStamp = KSCONVERT_PERFORMANCE_TIME(m_ullPerformanceCounterFrequency.QuadPart, ullPerfCounterTemp);
 
@@ -1791,8 +1770,6 @@ TimerNotifyRT
         }
     }
 #endif  //defined(SYSVAD_BTH_BYPASS) || defined(SYSVAD_USB_SIDEBAND)
-
-    _this->m_pMiniport->DpcRoutine(qpc.QuadPart, qpcFrequency.QuadPart);
 
     if (_this->m_KsState != KSSTATE_RUN)
     {
